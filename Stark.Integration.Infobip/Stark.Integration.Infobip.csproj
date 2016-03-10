@@ -43,15 +43,18 @@
     <Compile Include="IJsonSerializer.cs" />
     <Compile Include="InfobipClient.cs" />
     <Compile Include="IPhoneNumberValidator.cs" />
+    <Compile Include="Models\Message.cs" />
+    <Compile Include="Models\Requests\SmsRequest.cs" />
+    <Compile Include="Models\Responses\BalanceDetailResponse.cs" />
     <Compile Include="Models\Responses\SmsResponse.cs" />
+    <Compile Include="Models\Responses\SmsResponseDetail.cs" />
+    <Compile Include="Models\Responses\Status.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimpleJson.cs" />
     <Compile Include="SimpleJsonSerializer.cs" />
     <Compile Include="TurkeyPhoneNumberValidator.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\Requests\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using Stark.Integration.Infobip.Models;
+using Stark.Integration.Infobip.Models.Requests;
+using Stark.Integration.Infobip.Models.Responses;
 
 namespace Stark.Integration.Infobip
 {
@@ -52,7 +56,25 @@ namespace Stark.Integration.Infobip
             _phoneNumberValidator = phoneNumberValidator;
         }
 
-        public 
+        public void Send(List<Message> messages)
+        {
+            SmsRequest request = new SmsRequest(messages);
+            SmsResponse response = Post<SmsResponse>("https://api.infobip.com/sms/1/text/multi", request);
+        }
+
+        public decimal GetBalance()
+        {
+            BalanceDetailResponse response = Get<BalanceDetailResponse>("https://api.infobip.com/account/1/balance");
+
+            decimal balance = 0M;
+
+            if (response != null)
+            {
+                balance = response.Balance;
+            }
+
+            return balance;
+        }
 
         #region Helpers
 
@@ -62,11 +84,8 @@ namespace Stark.Integration.Infobip
 
             try
             {
-                string jsonString = _serializer.Serialize(payload);
-                byte[] byteArray = Encoding.UTF8.GetBytes(jsonString);
-                string base64String = Convert.ToBase64String(byteArray);
-                string requestString = String.Concat("data=", base64String);
-                byteArray = Encoding.UTF8.GetBytes(requestString);
+                string requestString = _serializer.Serialize(payload);
+                byte[] byteArray = Encoding.UTF8.GetBytes(requestString);
 
                 WebRequest request = WebRequest.Create(url);
                 request.Timeout = (int)_timeOut.TotalMilliseconds;
@@ -90,8 +109,60 @@ namespace Stark.Integration.Infobip
                         using (StreamReader sr = new StreamReader(responseStream))
                         {
                             string responseString = sr.ReadToEnd().Trim();
-                            byteArray = Convert.FromBase64String(responseString);
-                            responseString = Encoding.UTF8.GetString(byteArray);
+                            defaultResponse = _serializer.Deserialize<T>(responseString);
+                            return defaultResponse;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                defaultResponse = default(T);
+            }
+
+            return defaultResponse;
+        }
+
+        private T Get<T>(string url, Dictionary<string, string> parameters = null)
+        {
+            T defaultResponse = default(T);
+
+            try
+            {
+                if (parameters != null && parameters.Count > 0)
+                {
+                    string query = String.Empty;
+
+                    foreach (KeyValuePair<string, string> pair in parameters)
+                    {
+                        if (!String.IsNullOrEmpty(query))
+                        {
+                            query = String.Concat(query, "&");
+                        }
+
+                        query = String.Concat(query, pair.Key, "=", pair.Value);
+                    }
+
+                    url = String.Concat(url, "?", query);
+                }
+
+                WebRequest request = WebRequest.Create(url);
+                request.Timeout = (int)_timeOut.TotalMilliseconds;
+                request.ContentType = "application/json";
+                request.Method = "GET";
+                request.Headers.Add("Authorization", String.Join(" ", "Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes(String.Join(":", _userName, _password)))));
+
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+
+                using (Stream responseStream = response.GetResponseStream())
+                {
+                    
+
+                    if (responseStream != null && responseStream != Stream.Null)
+                    {
+                        using (StreamReader sr = new StreamReader(responseStream))
+                        {
+                            string responseString = sr.ReadToEnd().Trim();
                             defaultResponse = _serializer.Deserialize<T>(responseString);
                             return defaultResponse;
                         }
