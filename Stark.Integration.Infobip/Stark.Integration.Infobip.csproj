@@ -46,6 +46,10 @@
     <Compile Include="Models\Message.cs" />
     <Compile Include="Models\Requests\SmsRequest.cs" />
     <Compile Include="Models\Responses\BalanceDetailResponse.cs" />
+    <Compile Include="Models\Responses\DeliveryReportResponse.cs" />
+    <Compile Include="Models\Responses\DeliveryReportResponseDetail.cs" />
+    <Compile Include="Models\Responses\Error.cs" />
+    <Compile Include="Models\Responses\HttpResponse.cs" />
     <Compile Include="Models\Responses\SmsResponse.cs" />
     <Compile Include="Models\Responses\SmsResponseDetail.cs" />
     <Compile Include="Models\Responses\Status.cs" />

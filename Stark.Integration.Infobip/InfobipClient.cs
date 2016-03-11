@@ -56,31 +56,35 @@ namespace Stark.Integration.Infobip
             _phoneNumberValidator = phoneNumberValidator;
         }
 
-        public void Send(List<Message> messages)
+        public HttpResponse<SmsResponse> Send(List<Message> messages)
         {
             SmsRequest request = new SmsRequest(messages);
-            SmsResponse response = Post<SmsResponse>("https://api.infobip.com/sms/1/text/multi", request);
+            HttpResponse<SmsResponse> response = Post<SmsResponse>("https://api.infobip.com/sms/1/text/multi", request);
+            return response;
         }
 
-        public decimal GetBalance()
+        public HttpResponse<DeliveryReportResponse> GetDeliveryReports(string packageId, string messageId)
         {
-            BalanceDetailResponse response = Get<BalanceDetailResponse>("https://api.infobip.com/account/1/balance");
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
+            parameters.Add("bulkId", packageId);
+            parameters.Add("messageId", messageId);
+            parameters.Add("limit", "10000");
 
-            decimal balance = 0M;
+            HttpResponse<DeliveryReportResponse> response = Get<DeliveryReportResponse>("https://api.infobip.com/sms/1/reports", parameters);
+            return response;
+        }
 
-            if (response != null)
-            {
-                balance = response.Balance;
-            }
-
-            return balance;
+        public HttpResponse<BalanceDetailResponse> GetBalance()
+        {
+            HttpResponse<BalanceDetailResponse> response = Get<BalanceDetailResponse>("https://api.infobip.com/account/1/balance");
+            return response;
         }
 
         #region Helpers
 
-        private T Post<T>(string url, object payload)
+        private HttpResponse<T> Post<T>(string url, object payload)
         {
-            T defaultResponse = default(T);
+            HttpResponse<T> result = new HttpResponse<T>();
 
             try
             {
@@ -92,7 +96,7 @@ namespace Stark.Integration.Infobip
                 request.ContentType = "application/json";
                 request.Method = "POST";
                 request.Headers.Add("Authorization", String.Join(" ", "Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes(String.Join(":", _userName, _password)))));
-                
+
                 request.ContentLength = byteArray.Length;
 
                 using (Stream requestStream = request.GetRequestStream())
@@ -100,32 +104,35 @@ namespace Stark.Integration.Infobip
                     requestStream.Write(byteArray, 0, byteArray.Length);
                 }
 
-                WebResponse response = request.GetResponse();
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
                 using (Stream responseStream = response.GetResponseStream())
                 {
+                    result.StatusCode = response.StatusCode;
+
                     if (responseStream != null && responseStream != Stream.Null)
                     {
                         using (StreamReader sr = new StreamReader(responseStream))
                         {
                             string responseString = sr.ReadToEnd().Trim();
-                            defaultResponse = _serializer.Deserialize<T>(responseString);
-                            return defaultResponse;
+                            result.Data = _serializer.Deserialize<T>(responseString);
+                            return result;
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                defaultResponse = default(T);
+                result.StatusCode = HttpStatusCode.BadRequest;
+                result.Message = ex.Message;
             }
 
-            return defaultResponse;
+            return result;
         }
 
-        private T Get<T>(string url, Dictionary<string, string> parameters = null)
+        private HttpResponse<T> Get<T>(string url, Dictionary<string, string> parameters = null)
         {
-            T defaultResponse = default(T);
+            HttpResponse<T> result = new HttpResponse<T>();
 
             try
             {
@@ -135,12 +142,15 @@ namespace Stark.Integration.Infobip
 
                     foreach (KeyValuePair<string, string> pair in parameters)
                     {
-                        if (!String.IsNullOrEmpty(query))
+                        if (!String.IsNullOrEmpty(pair.Value))
                         {
-                            query = String.Concat(query, "&");
-                        }
+                            if (!String.IsNullOrEmpty(query))
+                            {
+                                query = String.Concat(query, "&");
+                            }
 
-                        query = String.Concat(query, pair.Key, "=", pair.Value);
+                            query = String.Concat(query, pair.Key, "=", pair.Value);
+                        }
                     }
 
                     url = String.Concat(url, "?", query);
@@ -156,25 +166,26 @@ namespace Stark.Integration.Infobip
 
                 using (Stream responseStream = response.GetResponseStream())
                 {
-                    
+                    result.StatusCode = response.StatusCode;
 
                     if (responseStream != null && responseStream != Stream.Null)
                     {
                         using (StreamReader sr = new StreamReader(responseStream))
                         {
                             string responseString = sr.ReadToEnd().Trim();
-                            defaultResponse = _serializer.Deserialize<T>(responseString);
-                            return defaultResponse;
+                            result.Data = _serializer.Deserialize<T>(responseString);
+                            return result;
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                defaultResponse = default(T);
+                result.StatusCode = HttpStatusCode.BadRequest;
+                result.Message = ex.Message;
             }
 
-            return defaultResponse;
+            return result;
         }
 
         #endregion

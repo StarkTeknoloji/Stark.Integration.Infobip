@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Stark.Integration.Infobip.Models;
+using Stark.Integration.Infobip.Models.Responses;
 
 namespace Stark.Integration.Infobip.IntegrationTests
 {
@@ -15,19 +16,27 @@ namespace Stark.Integration.Infobip.IntegrationTests
         public void SmsSendTest()
         {
             InfobipClient client = new InfobipClient(UserName, Password);
-            client.Send(new List<Message>() { GetDummyMessage() });
+            HttpResponse<SmsResponse> response = client.Send(new List<Message>() { GetDummyMessage() });
+        }
+
+        [TestMethod]
+        public void GetDeliveryReportsTest()
+        {
+            string packageId = "1457694661433301757";
+            InfobipClient client = new InfobipClient(UserName, Password);
+            HttpResponse<DeliveryReportResponse> response = client.GetDeliveryReports(packageId, String.Empty);
         }
 
         [TestMethod]
         public void GetBalanceTest()
         {
             InfobipClient client = new InfobipClient(UserName, Password);
-            decimal balance = client.GetBalance();
+            HttpResponse<BalanceDetailResponse> response = client.GetBalance();
         }
 
         private Message GetDummyMessage()
         {
-            Message message = new Message("CAGRI SMS", new List<string>() { "00905542346742", "00905415058766" }, "Whatsapp baby...");
+            Message message = new Message("CAGRI SMS", new List<string>() { "00905542346742" }, "Whatsapp baby...");
             return message;
         }
     }
