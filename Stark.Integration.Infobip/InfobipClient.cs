@@ -70,7 +70,7 @@ namespace Stark.Integration.Infobip
             parameters.Add("messageId", messageId);
             parameters.Add("limit", "10000");
 
-            HttpResponse<DeliveryReportResponse> response = Get<DeliveryReportResponse>("https://api.infobip.com/sms/1/reports", parameters);
+            HttpResponse<DeliveryReportResponse> response = Get<DeliveryReportResponse>("https://api.infobip.com/sms/1/logs", parameters);
             return response;
         }
 
@@ -115,6 +115,7 @@ namespace Stark.Integration.Infobip
                         using (StreamReader sr = new StreamReader(responseStream))
                         {
                             string responseString = sr.ReadToEnd().Trim();
+                            result.RawResponse = responseString;
                             result.Data = _serializer.Deserialize<T>(responseString);
                             return result;
                         }
@@ -173,6 +174,7 @@ namespace Stark.Integration.Infobip
                         using (StreamReader sr = new StreamReader(responseStream))
                         {
                             string responseString = sr.ReadToEnd().Trim();
+                            result.RawResponse = responseString;
                             result.Data = _serializer.Deserialize<T>(responseString);
                             return result;
                         }
