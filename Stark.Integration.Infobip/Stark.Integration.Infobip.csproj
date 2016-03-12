@@ -40,6 +40,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConsoleAuditLogger.cs" />
+    <Compile Include="IAuditLogger.cs" />
     <Compile Include="IJsonSerializer.cs" />
     <Compile Include="InfobipClient.cs" />
     <Compile Include="IPhoneNumberValidator.cs" />

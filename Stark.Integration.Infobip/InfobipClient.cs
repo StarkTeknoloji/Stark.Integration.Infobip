@@ -16,6 +16,7 @@ namespace Stark.Integration.Infobip
         private readonly TimeSpan _timeOut;
         private readonly IJsonSerializer _serializer;
         private readonly IPhoneNumberValidator _phoneNumberValidator;
+        private readonly IAuditLogger _auditLogger;
 
         public InfobipClient(string userName, string password)
             : this(userName, password, TimeSpan.FromSeconds(30))
@@ -33,6 +34,12 @@ namespace Stark.Integration.Infobip
         }
 
         public InfobipClient(string userName, string password, TimeSpan timeOut, IPhoneNumberValidator phoneNumberValidator, IJsonSerializer serializer)
+            : this(userName, password, timeOut, phoneNumberValidator, serializer, new ConsoleAuditLogger())
+        {
+            
+        }
+
+        public InfobipClient(string userName, string password, TimeSpan timeOut, IPhoneNumberValidator phoneNumberValidator, IJsonSerializer serializer, IAuditLogger logger)
         {
             if (String.IsNullOrEmpty(userName))
             {
@@ -46,14 +53,18 @@ namespace Stark.Integration.Infobip
 
             if (serializer == null)
             {
-                throw new ArgumentNullException("serializer");
+                _serializer = new SimpleJsonSerializer();
+            }
+            else
+            {
+                _serializer = serializer;
             }
 
             _userName = userName;
             _password = password;
             _timeOut = timeOut;
-            _serializer = serializer;
             _phoneNumberValidator = phoneNumberValidator;
+            _auditLogger = logger;
         }
 
         public HttpResponse<SmsResponse> Send(List<Message> messages)
@@ -86,9 +97,13 @@ namespace Stark.Integration.Infobip
         {
             HttpResponse<T> result = new HttpResponse<T>();
 
+            string requestString = String.Empty;
+            string responseCode = String.Empty;
+            string responseString = String.Empty;
+
             try
             {
-                string requestString = _serializer.Serialize(payload);
+                requestString = _serializer.Serialize(payload);
                 byte[] byteArray = Encoding.UTF8.GetBytes(requestString);
 
                 WebRequest request = WebRequest.Create(url);
@@ -108,13 +123,14 @@ namespace Stark.Integration.Infobip
 
                 using (Stream responseStream = response.GetResponseStream())
                 {
+                    responseCode = response.StatusCode.ToString();
                     result.StatusCode = response.StatusCode;
 
                     if (responseStream != null && responseStream != Stream.Null)
                     {
                         using (StreamReader sr = new StreamReader(responseStream))
                         {
-                            string responseString = sr.ReadToEnd().Trim();
+                            responseString = sr.ReadToEnd().Trim();
                             result.RawResponse = responseString;
                             result.Data = _serializer.Deserialize<T>(responseString);
                             return result;
@@ -126,7 +142,19 @@ namespace Stark.Integration.Infobip
             {
                 result.StatusCode = HttpStatusCode.BadRequest;
                 result.Message = ex.Message;
+
+                if (String.IsNullOrEmpty(responseCode))
+                {
+                    responseCode = "ExceptionCaught";
+                }
+                
+                if (String.IsNullOrEmpty(responseString))
+                {
+                    responseString = ex.Message;
+                }
             }
+
+            _auditLogger.Log("POST", url, requestString, responseCode, responseString);
 
             return result;
         }
@@ -134,6 +162,10 @@ namespace Stark.Integration.Infobip
         private HttpResponse<T> Get<T>(string url, Dictionary<string, string> parameters = null)
         {
             HttpResponse<T> result = new HttpResponse<T>();
+
+            string requestString = String.Empty;
+            string responseCode = String.Empty;
+            string responseString = String.Empty;
 
             try
             {
@@ -173,7 +205,7 @@ namespace Stark.Integration.Infobip
                     {
                         using (StreamReader sr = new StreamReader(responseStream))
                         {
-                            string responseString = sr.ReadToEnd().Trim();
+                            responseString = sr.ReadToEnd().Trim();
                             result.RawResponse = responseString;
                             result.Data = _serializer.Deserialize<T>(responseString);
                             return result;
@@ -185,7 +217,19 @@ namespace Stark.Integration.Infobip
             {
                 result.StatusCode = HttpStatusCode.BadRequest;
                 result.Message = ex.Message;
+
+                if (String.IsNullOrEmpty(responseCode))
+                {
+                    responseCode = "ExceptionCaught";
+                }
+
+                if (String.IsNullOrEmpty(responseString))
+                {
+                    responseString = ex.Message;
+                }
             }
+
+            _auditLogger.Log("GET", url, requestString, responseCode, responseString);
 
             return result;
         }
