@@ -133,7 +133,6 @@ namespace Stark.Integration.Infobip
                             responseString = sr.ReadToEnd().Trim();
                             result.RawResponse = responseString;
                             result.Data = _serializer.Deserialize<T>(responseString);
-                            return result;
                         }
                     }
                 }
@@ -208,7 +207,6 @@ namespace Stark.Integration.Infobip
                             responseString = sr.ReadToEnd().Trim();
                             result.RawResponse = responseString;
                             result.Data = _serializer.Deserialize<T>(responseString);
-                            return result;
                         }
                     }
                 }
