@@ -6,6 +6,7 @@ using Stark.Integration.Infobip.Models.Responses;
 
 namespace Stark.Integration.Infobip.IntegrationTests
 {
+    [Ignore]
     [TestClass]
     public class IntegrationTest
     {
