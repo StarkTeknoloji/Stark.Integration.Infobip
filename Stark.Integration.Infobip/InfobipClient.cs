@@ -81,7 +81,7 @@ namespace Stark.Integration.Infobip
             parameters.Add("messageId", messageId);
             parameters.Add("limit", "10000");
 
-            HttpResponse<DeliveryReportResponse> response = Get<DeliveryReportResponse>("https://api.infobip.com/sms/1/logs", parameters);
+            HttpResponse<DeliveryReportResponse> response = Get<DeliveryReportResponse>("https://api.infobip.com/sms/1/reports", parameters);
             return response;
         }
 
