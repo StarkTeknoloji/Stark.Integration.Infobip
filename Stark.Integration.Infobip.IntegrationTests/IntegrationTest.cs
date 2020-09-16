@@ -6,7 +6,6 @@ using Stark.Integration.Infobip.Models.Responses;
 
 namespace Stark.Integration.Infobip.IntegrationTests
 {
-    [Ignore]
     [TestClass]
     public class IntegrationTest
     {
@@ -37,7 +36,7 @@ namespace Stark.Integration.Infobip.IntegrationTests
 
         private Message GetDummyMessage()
         {
-            Message message = new Message("CAGRI SMS", new List<string>() { "00905542346742" }, "Whatsapp baby...");
+            Message message = new Message("CAGRI SMS", new List<string>() { "+905542346742" }, "Whatsapp baby...");
             return message;
         }
     }

@@ -13,6 +13,7 @@ namespace Stark.Integration.Infobip
     {
         private readonly string _userName;
         private readonly string _password;
+        private readonly string _baseUrl;
         private readonly TimeSpan _timeOut;
         private readonly IJsonSerializer _serializer;
         private readonly IPhoneNumberValidator _phoneNumberValidator;
@@ -40,6 +41,12 @@ namespace Stark.Integration.Infobip
         }
 
         public InfobipClient(string userName, string password, TimeSpan timeOut, IPhoneNumberValidator phoneNumberValidator, IJsonSerializer serializer, IAuditLogger logger)
+            : this(userName, password, timeOut, phoneNumberValidator, serializer, new ConsoleAuditLogger(), "https://api.infobip.com")
+        {
+            
+        }
+
+        public InfobipClient(string userName, string password, TimeSpan timeOut, IPhoneNumberValidator phoneNumberValidator, IJsonSerializer serializer, IAuditLogger logger, string baseUrl)
         {
             if (String.IsNullOrEmpty(userName))
             {
@@ -65,12 +72,13 @@ namespace Stark.Integration.Infobip
             _timeOut = timeOut;
             _phoneNumberValidator = phoneNumberValidator;
             _auditLogger = logger;
+            _baseUrl = baseUrl;
         }
 
         public HttpResponse<SmsResponse> Send(List<Message> messages)
         {
             SmsRequest request = new SmsRequest(messages);
-            HttpResponse<SmsResponse> response = Post<SmsResponse>("https://api.infobip.com/sms/1/text/multi", request);
+            HttpResponse<SmsResponse> response = Post<SmsResponse>($"{_baseUrl.TrimEnd('/')}/sms/1/text/multi", request);
             return response;
         }
 
@@ -81,13 +89,13 @@ namespace Stark.Integration.Infobip
             parameters.Add("messageId", messageId);
             parameters.Add("limit", "10000");
 
-            HttpResponse<DeliveryReportResponse> response = Get<DeliveryReportResponse>("https://api.infobip.com/sms/1/reports", parameters);
+            HttpResponse<DeliveryReportResponse> response = Get<DeliveryReportResponse>($"{_baseUrl.TrimEnd('/')}/sms/1/reports", parameters);
             return response;
         }
 
         public HttpResponse<BalanceDetailResponse> GetBalance()
         {
-            HttpResponse<BalanceDetailResponse> response = Get<BalanceDetailResponse>("https://api.infobip.com/account/1/balance");
+            HttpResponse<BalanceDetailResponse> response = Get<BalanceDetailResponse>($"{_baseUrl.TrimEnd('/')}/account/1/balance");
             return response;
         }
 
