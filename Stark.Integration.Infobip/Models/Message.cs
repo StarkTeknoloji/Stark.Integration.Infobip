@@ -17,6 +17,15 @@ namespace Stark.Integration.Infobip.Models
         [DataMember(Name = "text")]
         public string Content { get; set; }
 
+        [DataMember(Name = "notifyContentType")]
+        public string NotifyContentType { get; set; }
+
+        [DataMember(Name = "notifyUrl")]
+        public string NotifyUrl { get; set; }
+
+        [DataMember(Name = "notify")]
+        public bool Notify { get; set; }
+
         public Message(string originator, List<string> numbers, string content)
         {
             if (String.IsNullOrEmpty(originator) || numbers == null || !numbers.Any())
