@@ -6,6 +6,7 @@ using Stark.Integration.Infobip.Models.Responses;
 
 namespace Stark.Integration.Infobip.IntegrationTests
 {
+    [Ignore]
     [TestClass]
     public class IntegrationTest
     {
@@ -15,7 +16,7 @@ namespace Stark.Integration.Infobip.IntegrationTests
         [TestMethod]
         public void SmsSendTest()
         {
-            InfobipClient client = new InfobipClient(UserName, Password);
+            InfobipClient client = new InfobipClient(UserName, Password, TimeSpan.FromMinutes(5), new TurkeyPhoneNumberValidator(), new SimpleJsonSerializer(), new ConsoleAuditLogger(), "");
             HttpResponse<SmsResponse> response = client.Send(new List<Message>() { GetDummyMessage() });
         }
 

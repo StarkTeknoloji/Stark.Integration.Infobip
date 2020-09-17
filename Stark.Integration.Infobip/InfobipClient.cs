@@ -41,7 +41,7 @@ namespace Stark.Integration.Infobip
         }
 
         public InfobipClient(string userName, string password, TimeSpan timeOut, IPhoneNumberValidator phoneNumberValidator, IJsonSerializer serializer, IAuditLogger logger)
-            : this(userName, password, timeOut, phoneNumberValidator, serializer, new ConsoleAuditLogger(), "https://api.infobip.com")
+            : this(userName, password, timeOut, phoneNumberValidator, serializer, logger, "https://api.infobip.com")
         {
             
         }
