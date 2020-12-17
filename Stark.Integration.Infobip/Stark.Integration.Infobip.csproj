@@ -45,6 +45,8 @@
     <Compile Include="IJsonSerializer.cs" />
     <Compile Include="InfobipClient.cs" />
     <Compile Include="IPhoneNumberValidator.cs" />
+    <Compile Include="Models\Destination.cs" />
+    <Compile Include="Models\Language.cs" />
     <Compile Include="Models\Message.cs" />
     <Compile Include="Models\Requests\SmsRequest.cs" />
     <Compile Include="Models\Responses\BalanceDetailResponse.cs" />

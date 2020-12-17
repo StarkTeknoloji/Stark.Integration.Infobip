@@ -78,7 +78,7 @@ namespace Stark.Integration.Infobip
         public HttpResponse<SmsResponse> Send(List<Message> messages)
         {
             SmsRequest request = new SmsRequest(messages);
-            HttpResponse<SmsResponse> response = Post<SmsResponse>($"{_baseUrl.TrimEnd('/')}/sms/1/text/multi", request);
+            HttpResponse<SmsResponse> response = Post<SmsResponse>($"{_baseUrl.TrimEnd('/')}/sms/1/text/advanced", request);
             return response;
         }
 
