@@ -29,6 +29,9 @@ namespace Stark.Integration.Infobip.Models
         [DataMember(Name = "notifyUrl")]
         public string NotifyUrl { get; set; }
 
+        [DataMember(Name = "callbackData")]
+        public string CallbackData { get; set; }
+
         [DataMember(Name = "notify")]
         public bool Notify { get; set; }
 
