@@ -18,10 +18,10 @@ namespace Stark.Integration.Infobip.Models
         public string Content { get; set; }
 
         [DataMember(Name = "transliteration")]
-        public string Transliteration { get; set; } = "TURKISH";
+        public string Transliteration { get; set; }
 
         [DataMember(Name = "language")]
-        public Language Language { get; set; } = new Language();
+        public Language Language { get; set; }
 
         [DataMember(Name = "notifyContentType")]
         public string NotifyContentType { get; set; }
@@ -31,6 +31,9 @@ namespace Stark.Integration.Infobip.Models
 
         [DataMember(Name = "callbackData")]
         public string CallbackData { get; set; }
+
+        [DataMember(Name = "encoding")]
+        public string Encoding { get; set; } = "default";
 
         [DataMember(Name = "notify")]
         public bool Notify { get; set; }
