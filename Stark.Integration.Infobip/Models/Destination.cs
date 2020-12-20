@@ -7,8 +7,5 @@ namespace Stark.Integration.Infobip.Models
     {
         [DataMember(Name = "to")]
         public string Number { get; set; }
-
-        [DataMember(Name = "messageId")]
-        public string MessageId { get; set; }
     }
 }

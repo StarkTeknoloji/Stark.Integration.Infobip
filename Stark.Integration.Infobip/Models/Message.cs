@@ -17,15 +17,6 @@ namespace Stark.Integration.Infobip.Models
         [DataMember(Name = "text")]
         public string Content { get; set; }
 
-        [DataMember(Name = "transliteration")]
-        public string Transliteration { get; set; }
-
-        [DataMember(Name = "language")]
-        public Language Language { get; set; }
-
-        [DataMember(Name = "notifyContentType")]
-        public string NotifyContentType { get; set; }
-
         [DataMember(Name = "notifyUrl")]
         public string NotifyUrl { get; set; }
 
